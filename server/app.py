@@ -4,11 +4,13 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_migrate import Migrate
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['JWT_SECRET_KEY'] = '2a471f3357ce40230b9f670bd05ec405384d502a70bbc3bf98d4509f4620e96a'
 
+CORS(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
@@ -46,13 +48,14 @@ class Order(db.Model):
     status = db.Column(db.String(50), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
 
-class OrderItem(db.Model):
-    __tablename__ = 'order_items'
+class SupplyOrder(db.Model):
+    __tablename__ = 'supply_order'
     order_item_id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
+    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 # Models end here    
 
 # Routes start here
@@ -75,7 +78,7 @@ def login():
     return jsonify(message="Invalid credentials"), 401
 
 @app.route('/sales', methods=['GET', 'POST'])
-@jwt_required()
+# @jwt_required()
 def manage_sales():
     if request.method == 'POST':
         data = request.get_json()
@@ -95,7 +98,7 @@ def manage_sales():
         return jsonify([sale.to_dict() for sale in sales]), 200
 
 @app.route('/products', methods=['GET', 'POST'])
-@jwt_required()
+# @jwt_required()
 def manage_products():
     if request.method == 'POST':
         data = request.get_json()
@@ -113,7 +116,7 @@ def manage_products():
         return jsonify([product.to_dict() for product in products]), 200
 
 @app.route('/orders', methods=['GET', 'POST'])
-@jwt_required()
+# @jwt_required()
 def manage_orders():
     if request.method == 'POST':
         data = request.get_json()
@@ -136,7 +139,7 @@ def to_dict(self):
     return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 # Adding the to_dict method to each model
-for cls in [Admin, Sales, Product, Order, OrderItem]:
+for cls in [Admin, Sales, Product, Order, SupplyOrder]:
     cls.to_dict = to_dict
 
 if __name__ == '__main__':

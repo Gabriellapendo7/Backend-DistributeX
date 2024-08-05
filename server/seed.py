@@ -1,8 +1,6 @@
-from faker import Faker
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_migrate import Migrate
 from datetime import datetime
 
 app = Flask(__name__)
@@ -10,117 +8,54 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['JWT_SECRET_KEY'] = '2a471f3357ce40230b9f670bd05ec405384d502a70bbc3bf98d4509f4620e96a'
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
-faker = Faker()
 
-# Models start here
-class Admin(db.Model):
-    __tablename__ = 'admins'
-    admin_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+# Import models after setting up db and app
+from app import Admin, Sales, Product, Order, SupplyOrder
 
-class Sales(db.Model):
-    __tablename__ = 'sales'
-    sales_id = db.Column(db.Integer, primary_key=True)
-    receipt_id = db.Column(db.String(100), nullable=False)
-    admin_id = db.Column(db.Integer, db.ForeignKey('admins.admin_id'), nullable=False)
-    total_amount = db.Column(db.Float, nullable=False)
-    client_id = db.Column(db.Integer, nullable=False)
-    sale_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+# Create the database tables within the app context
+with app.app_context():
+    db.create_all()
 
-class Product(db.Model):
-    __tablename__ = 'products'
-    product_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=True)
-    price = db.Column(db.Float, nullable=False)
-    stock = db.Column(db.Integer, nullable=False)
+    # Seed data for Admin
+    admin1 = Admin(username='admin1', password=bcrypt.generate_password_hash('123').decode('utf-8'))
+    admin2 = Admin(username='admin2', password=bcrypt.generate_password_hash('123').decode('utf-8'))
 
-class Order(db.Model):
-    __tablename__ = 'orders'
-    order_id = db.Column(db.Integer, primary_key=True)
-    client_id = db.Column(db.Integer, nullable=False)
-    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.Column(db.String(50), nullable=False)
-    total_amount = db.Column(db.Float, nullable=False)
+    # Seed data for Products
+    product1 = Product(name='Product1', description='Description for product 1', price=10.99, stock=100)
+    product2 = Product(name='Product2', description='Description for product 2', price=20.99, stock=200)
+    product3 = Product(name='Product3', description='Description for product 3', price=30.99, stock=300)
 
-class OrderItem(db.Model):
-    __tablename__ = 'order_items'
-    order_item_id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)
-# Models end here
+    # Seed data for Orders
+    order1 = Order(client_id=1, order_date=datetime.utcnow(), status='Pending', total_amount=100.50)
+    order2 = Order(client_id=2, order_date=datetime.utcnow(), status='Shipped', total_amount=200.75)
 
-# Faker data generation
-def create_fake_data():
-    # Create fake Admins
-    for _ in range(5):
-        hashed_password = bcrypt.generate_password_hash(faker.password()).decode('utf-8')
-        new_admin = Admin(
-            username=faker.user_name(),
-            password=hashed_password
-        )
-        db.session.add(new_admin)
+    # Seed data for Sales
+    sale1 = Sales(receipt_id='R001', admin_id=1, total_amount=100.50, client_id=1, sale_date=datetime.utcnow())
+    sale2 = Sales(receipt_id='R002', admin_id=2, total_amount=200.75, client_id=2, sale_date=datetime.utcnow())
 
-    # Create fake Products
-    for _ in range(20):
-        new_product = Product(
-            name=faker.word(),
-            description=faker.sentence(),
-            price=round(faker.random_number(digits=2), 2),
-            stock=faker.random_int(min=1, max=100)
-        )
-        db.session.add(new_product)
+    # Seed data for SupplyOrders
+    supply_order1 = SupplyOrder(order_id=1, product_id=1, quantity=10, price=10.99, order_date=datetime.utcnow())
+    supply_order2 = SupplyOrder(order_id=2, product_id=2, quantity=20, price=20.99, order_date=datetime.utcnow())
 
+    # Add all seed data to the session
+    db.session.add(admin1)
+    db.session.add(admin2)
+
+    db.session.add(product1)
+    db.session.add(product2)
+    db.session.add(product3)
+
+    db.session.add(order1)
+    db.session.add(order2)
+
+    db.session.add(sale1)
+    db.session.add(sale2)
+
+    db.session.add(supply_order1)
+    db.session.add(supply_order2)
+
+    # Commit the session
     db.session.commit()
 
-    # Create fake Sales and Orders
-    admins = Admin.query.all()
-    products = Product.query.all()
-    
-    for _ in range(50):
-        admin = faker.random_element(admins)
-        new_sale = Sales(
-            receipt_id=faker.uuid4(),
-            admin_id=admin.admin_id,
-            total_amount=round(faker.random_number(digits=2), 2),
-            client_id=faker.random_int(min=1, max=1000),
-            sale_date=faker.date_time_this_year()
-        )
-        db.session.add(new_sale)
-    
-    for _ in range(30):
-        new_order = Order(
-            client_id=faker.random_int(min=1, max=1000),
-            order_date=faker.date_time_this_year(),
-            status=faker.random_element(elements=('Pending', 'Shipped', 'Delivered')),
-            total_amount=round(faker.random_number(digits=2), 2)
-        )
-        db.session.add(new_order)
-    
-    db.session.commit()
-
-    orders = Order.query.all()
-    
-    for _ in range(100):
-        order = faker.random_element(orders)
-        product = faker.random_element(products)
-        new_order_item = OrderItem(
-            order_id=order.order_id,
-            product_id=product.product_id,
-            quantity=faker.random_int(min=1, max=10),
-            price=round(product.price * faker.random_int(min=1, max=10), 2)
-        )
-        db.session.add(new_order_item)
-
-    db.session.commit()
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        create_fake_data()
-        print("Fake data created successfully!")
+    print("Database seeded!")
