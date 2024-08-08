@@ -1,13 +1,24 @@
-import os
+from flask import Flask
+from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
+from flask_restful import Api
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
+
+metadata = MetaData(
+    naming_convention={
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    }
+)
+db = SQLAlchemy(metadata=metadata)
+ma = Marshmallow()
+migrate = Migrate()
+
+bcrypt = Bcrypt()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'a_hard_to_guess_string'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///distributex.db'
+    SQLALCHEMY_DATABASE_URI = "sqlite:///distributex.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'another_hard_to_guess_string'
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.googlemail.com'
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'noreply@demo.com'
+    JSON_COMPACT = False
