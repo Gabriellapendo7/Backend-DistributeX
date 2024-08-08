@@ -1,21 +1,6 @@
-from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
-from flask_cors import CORS
 from datetime import datetime
-
-
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///distributex.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-metadata = MetaData(naming_convention={
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-})
-
-db = SQLAlchemy(app, metadata=metadata)
-CORS(app)
+from config import db
 
 
 class Admin(db.Model):
@@ -150,7 +135,9 @@ class Sales(db.Model):
     Sale_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
 
-
 if __name__ == '__main__':
-    db.create_all()
+    from config import create_app  
+    app = create_app()  
+    with app.app_context():
+        db.create_all()  
     app.run(debug=True)
