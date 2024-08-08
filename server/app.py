@@ -1,3 +1,4 @@
+#app.py
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -18,44 +19,136 @@ jwt = JWTManager(app)
 
 # Models start here
 class Admin(db.Model):
-    __tablename__ = 'admins'
-    admin_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    __tablename__ = 'admin'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    Username = db.Column(db.String(64), unique=True, nullable=False)
+    Email = db.Column(db.String(120), unique=True, nullable=False)
+    Password = db.Column(db.String(128), nullable=False)
 
-class Sales(db.Model):
-    __tablename__ = 'sales'
-    sales_id = db.Column(db.Integer, primary_key=True)
-    receipt_id = db.Column(db.String(100), nullable=False)
-    admin_id = db.Column(db.Integer, db.ForeignKey('admins.admin_id'), nullable=False)
-    total_amount = db.Column(db.Float, nullable=False)
-    client_id = db.Column(db.Integer, nullable=False)
-    sale_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+class Manufacturer(db.Model):
+    __tablename__ = 'manufacturer'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    Username = db.Column(db.String(64), unique=True, nullable=False)
+    Email = db.Column(db.String(120), unique=True, nullable=False)
+    Password = db.Column(db.String(128), nullable=False)
+    Companyname = db.Column(db.String(128))
+    Contactinfo = db.Column(db.String(128))
+
+
+
+class Client(db.Model):
+    __tablename__ = 'client'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    Username = db.Column(db.String(64), unique=True, nullable=False)
+    Email = db.Column(db.String(120), unique=True, nullable=False)
+    Password = db.Column(db.String(128), nullable=False)
+    Shipping_address = db.Column(db.String(128))
+
+
+
+class Category(db.Model):
+    __tablename__ = 'category'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=True)
+
+
 
 class Product(db.Model):
-    __tablename__ = 'products'
-    product_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=True)
-    price = db.Column(db.Float, nullable=False)
-    stock = db.Column(db.Integer, nullable=False)
+    __tablename__ = 'product'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Productname = db.Column(db.String(255), nullable=False)
+    productdescription = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.String(255), nullable=True)
+    availability = db.Column(db.String(255), nullable=True)
+    price = db.Column(db.BigInteger, nullable=False)
+    CategoryID = db.Column(db.BigInteger, db.ForeignKey('category.ID'), nullable=False)
+    manufacturerID = db.Column(db.BigInteger, db.ForeignKey('manufacturer.ID'), nullable=False)
+    ImageURL = db.Column(db.String(255), nullable=True)
+    supply_id = db.Column(db.BigInteger, db.ForeignKey('supply.ID'), nullable=True)
+
+
 
 class Order(db.Model):
-    __tablename__ = 'orders'
-    order_id = db.Column(db.Integer, primary_key=True)
-    client_id = db.Column(db.Integer, nullable=False)
-    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.Column(db.String(50), nullable=False)
-    total_amount = db.Column(db.Float, nullable=False)
+    __tablename__ = 'order'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ClientID = db.Column(db.BigInteger, db.ForeignKey('client.ID'), nullable=False)
+    order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    status = db.Column(db.String(255), nullable=False)
+    total = db.Column(db.BigInteger, nullable=False)
+
+
+
+class OrderDetails(db.Model):
+    __tablename__ = 'orderdetails'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    OrderID = db.Column(db.BigInteger, db.ForeignKey('order.ID'), nullable=False)
+    ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
+    quantity = db.Column(db.BigInteger, nullable=False)
+    price = db.Column(db.BigInteger, nullable=False)
+
+
+
+class Receipt(db.Model):
+    __tablename__ = 'receipt'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    OrderID = db.Column(db.BigInteger, db.ForeignKey('order.ID'), nullable=False)
+    ClientID = db.Column(db.BigInteger, db.ForeignKey('client.ID'), nullable=False)
+    ReceiptDate = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    Total = db.Column(db.BigInteger, nullable=False)
+    Payment = db.Column(db.BigInteger, nullable=False)
+
+
+
+class Cart(db.Model):
+    __tablename__ = 'cart'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ClientID = db.Column(db.BigInteger, db.ForeignKey('client.ID'), nullable=False)
+    CreateAt = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+
+class CartItem(db.Model):
+    __tablename__ = 'cartitem'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    CartID = db.Column(db.BigInteger, db.ForeignKey('cart.ID'), nullable=False)
+    ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
+    quantity = db.Column(db.BigInteger, nullable=False)
+
+
+
+class Supply(db.Model):
+    __tablename__ = 'supply'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    AdminID = db.Column(db.BigInteger, db.ForeignKey('admin.ID'), nullable=False)
+    ManufacturerID = db.Column(db.BigInteger, db.ForeignKey('manufacturer.ID'), nullable=False)
+    supply_name = db.Column(db.String(255), nullable=False)
+    quantity_ordered = db.Column(db.BigInteger, nullable=False)
+    order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
+
+
 
 class SupplyOrder(db.Model):
     __tablename__ = 'supply_order'
-    order_item_id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.product_id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    order_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
+    orderDate = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    quantity = db.Column(db.BigInteger, nullable=False)
+    total_price = db.Column(db.BigInteger, nullable=False)
+
+
+
+class Sales(db.Model):
+    __tablename__ = 'sales'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ReceiptID = db.Column(db.BigInteger, db.ForeignKey('receipt.ID'), nullable=False)
+    AdminID = db.Column(db.BigInteger, db.ForeignKey('admin.ID'), nullable=False)
+    TotalAmount = db.Column(db.BigInteger, nullable=False)
+    ClientID = db.Column(db.BigInteger, db.ForeignKey('client.ID'), nullable=False)
+    Sale_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
 # Models end here    
 
 # Routes start here
