@@ -1,49 +1,41 @@
-from flask import Blueprint, request, jsonify
-from models import Manufacturer
-from config import db, bcrypt 
-from helpers import validate_not_blank
-from flask_bcrypt import generate_password_hash, check_password_hash 
+from flask import Blueprint, jsonify
+from flask_restful import Api, Resource, reqparse
+from models import Manufacturer, db
 
-manufacturer_bp = Blueprint("manufacturer_bp", __name__)
+manufacturer_bp = Blueprint('manufacturer', __name__)
+api = Api(manufacturer_bp)
 
-@manufacturer_bp.route("/manufacturers", methods=["POST"])
-def signup():
-    data = request.get_json()
+class ManufacturerResource(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('Username', type=str, required=True, help='Username cannot be blank')
+        self.parser.add_argument('Email', type=str, required=True, help='Email cannot be blank')
+        self.parser.add_argument('Password', type=str, required=True, help='Password cannot be blank')
+        self.parser.add_argument('Companyname', type=str, required=True, help='Company name cannot be blank')
+        self.parser.add_argument('Contactinfo', type=str, required=True, help='Contact info cannot be blank')
 
-    try:
-        username = validate_not_blank(data["username"], "username")
-        password = validate_not_blank(data["password"], "password")
-        company_name = validate_not_blank(data["company_name"], "company_name")
-        contact_info = validate_not_blank(data["contact_info"], "contact_info")
-
-      
-        new_manufacturer = Manufacturer(
-            username=username,
-            company_name=company_name,
-            company_info=contact_info 
+    def post(self):
+        args = self.parser.parse_args()
+        manufacturer = Manufacturer(
+            Username=args['Username'],
+            Email=args['Email'],
+            Password=args['Password'],
+            Companyname=args['Companyname'],
+            Contactinfo=args['Contactinfo']
         )
-        new_manufacturer.password = generate_password_hash(password)  
-
-        db.session.add(new_manufacturer)
+        db.session.add(manufacturer)
         db.session.commit()
+        return {'message': 'Manufacturer created successfully.'}, 201
 
-        return jsonify({"message": "Signup successful!"}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+    def get(self, manufacturer_id):
+        manufacturer = Manufacturer.query.get_or_404(manufacturer_id)
+        return {
+            'ID': manufacturer.ID,
+            'Username': manufacturer.Username,
+            'Email': manufacturer.Email,
+            'Companyname': manufacturer.Companyname,
+            'Contactinfo': manufacturer.Contactinfo
+        }
 
 
-@manufacturer_bp.route("/manufacturers/login", methods=["POST"])
-def login():
-    data = request.get_json()
-
-    try:
-        username = validate_not_blank(data["username"], "username")
-        password = validate_not_blank(data["password"], "password")
-
-        manufacturer = Manufacturer.query.filter_by(username=username).first()
-        if manufacturer and check_password_hash(manufacturer.password, password):  
-            return jsonify({"message": "Login successful!"}), 200
-        else:
-            return jsonify({"error": "Invalid username or password"}), 401
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+api.add_resource(ManufacturerResource, '/manufacturer', '/manufacturer/<int:manufacturer_id>')

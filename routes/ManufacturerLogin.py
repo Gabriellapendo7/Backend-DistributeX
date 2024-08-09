@@ -3,7 +3,7 @@ from models import User
 from config import db  
 from helpers import commit_session  
 
-users_bp = Blueprint('users', __name__)
+users_bp = Blueprint('ManufacturerLogin', __name__)
 
 @users_bp.route('/users', methods=['GET'])
 def get_users():
