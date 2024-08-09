@@ -10,17 +10,6 @@ class Admin(db.Model):
     Email = db.Column(db.String(120), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
 
-class Manufacturer(db.Model):
-    __tablename__ = 'manufacturer'
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
-    Username = db.Column(db.String(64), unique=True, nullable=False)
-    Email = db.Column(db.String(120), unique=True, nullable=False)
-    Password = db.Column(db.String(128), nullable=False)
-    Companyname = db.Column(db.String(128))
-    Contactinfo = db.Column(db.String(128))
-    
-    
-    supplies = db.relationship('Supply', backref='manufacturer', lazy=True)
 
 
 
@@ -115,14 +104,36 @@ class Supply(db.Model):
     manufacturer_id = db.Column(db.Integer, db.ForeignKey('manufacturer.ID'), nullable=False)
 
 
+class Manufacturer(db.Model):
+    __tablename__ = 'manufacturer'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    Username = db.Column(db.String(64), unique=True, nullable=False)
+    Email = db.Column(db.String(120), unique=True, nullable=False)
+    Password = db.Column(db.String(128), nullable=False)
+    Companyname = db.Column(db.String(128))
+    Contactinfo = db.Column(db.String(128))
+    
+    
+    supplies = db.relationship('Supply', backref='manufacturer', lazy=True)
+
+
+
+
 
 class SupplyOrder(db.Model):
     __tablename__ = 'supply_order'
+    
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    contact_information = db.Column(db.Text, nullable=False)
+    delivery_schedule = db.Column(db.DateTime, nullable=False)
+    pricing_and_payment = db.Column(db.Float, nullable=False)
+    shipping_information = db.Column(db.Text, nullable=False)
+    product_information = db.Column(db.Text, nullable=False)
+    order_details = db.Column(db.Text, nullable=False)
+    
     ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
-    orderDate = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    quantity = db.Column(db.BigInteger, nullable=False)
-    total_price = db.Column(db.BigInteger, nullable=False)
+    product = db.relationship("Product", backref="supply_orders")  
+
 
 
 

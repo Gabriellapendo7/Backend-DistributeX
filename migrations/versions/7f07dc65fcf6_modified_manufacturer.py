@@ -1,8 +1,8 @@
-"""Add foreign key to Supply model
+"""Modified manufacturer
 
-Revision ID: 89478569b829
+Revision ID: 7f07dc65fcf6
 Revises: 
-Create Date: 2024-08-09 15:16:49.091751
+Create Date: 2024-08-09 20:17:37.010081
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '89478569b829'
+revision = '7f07dc65fcf6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -139,10 +139,13 @@ def upgrade():
     )
     op.create_table('supply_order',
     sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('contact_information', sa.Text(), nullable=False),
+    sa.Column('delivery_schedule', sa.DateTime(), nullable=False),
+    sa.Column('pricing_and_payment', sa.Float(), nullable=False),
+    sa.Column('shipping_information', sa.Text(), nullable=False),
+    sa.Column('product_information', sa.Text(), nullable=False),
+    sa.Column('order_details', sa.Text(), nullable=False),
     sa.Column('ProductID', sa.BigInteger(), nullable=False),
-    sa.Column('orderDate', sa.DateTime(), nullable=False),
-    sa.Column('quantity', sa.BigInteger(), nullable=False),
-    sa.Column('total_price', sa.BigInteger(), nullable=False),
     sa.ForeignKeyConstraint(['ProductID'], ['product.ID'], name=op.f('fk_supply_order_ProductID_product')),
     sa.PrimaryKeyConstraint('ID')
     )
