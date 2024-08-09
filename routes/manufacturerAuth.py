@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, request
+from flask import Blueprint, make_response, request, jsonify
 from models import Manufacturer
 from config import db, bcrypt 
 from helpers import commit_session  
@@ -35,12 +35,25 @@ def login_manufacturer():
     email = data["email"]
     password = data["password"]
 
+    # Fetch the manufacturer from the database using the provided email
     manufacturer = Manufacturer.query.filter_by(Email=email).first()
 
     if manufacturer is None:
         return make_response({"error": "Email not found"}, 404)
 
+    # Check if the provided password matches the stored password
     if bcrypt.check_password_hash(manufacturer.Password, password):
-        return make_response({"message": "Login successful", "manufacturer_id": manufacturer.ID}, 200)
+        # Create the response object and set cookies with the manufacturer ID and username
+        response = make_response(jsonify({
+            "message": "Login successful",
+            "manufacturer_id": manufacturer.ID,
+            "username": manufacturer.Username  
+        }), 200)
+        
+        # Set cookies with the manufacturer ID and username
+        response.set_cookie('manufacturer_id', str(manufacturer.ID), httponly=True)
+        response.set_cookie('manufacturer_username', manufacturer.Username, httponly=True)
+        
+        return response
     else:
         return make_response({"error": "Invalid credentials"}, 401)

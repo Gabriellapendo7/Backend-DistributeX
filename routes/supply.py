@@ -12,7 +12,7 @@ def add_supply():
     
     data = request.get_json()
 
-    if not all(key in data for key in ('supply_name', 'quantity_ordered', 'order_date')):
+    if not all(key in data for key in ('supply_name', 'quantity_ordered', 'order_date', 'manufacturer_id')):
         return jsonify({'message': 'Missing data'}), 400
 
     try:
@@ -21,7 +21,8 @@ def add_supply():
         new_supply = Supply(
             supply_name=data['supply_name'],
             quantity_ordered=data['quantity_ordered'],
-            order_date=order_date  
+            order_date=order_date,
+            manufacturer_id=data['manufacturer_id']  
         )
 
         db.session.add(new_supply)
@@ -43,7 +44,8 @@ def get_supplies():
             'ID': supply.ID,
             'supply_name': supply.supply_name,
             'quantity_ordered': supply.quantity_ordered,
-            'order_date': supply.order_date.strftime("%Y-%m-%d")
+            'order_date': supply.order_date.strftime("%Y-%m-%d"),
+            'manufacturer_id': supply.manufacturer_id 
         } for supply in supplies]
 
         return jsonify(supplies_list), 200
@@ -78,7 +80,8 @@ def update_supply(supply_id):
                 'ID': supply.ID,
                 'supply_name': supply.supply_name,
                 'quantity_ordered': supply.quantity_ordered,
-                'order_date': supply.order_date.strftime("%Y-%m-%d")
+                'order_date': supply.order_date.strftime("%Y-%m-%d"),
+                'manufacturer_id': supply.manufacturer_id  
             }
         }), 200
 

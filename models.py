@@ -10,7 +10,6 @@ class Admin(db.Model):
     Email = db.Column(db.String(120), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
 
-
 class Manufacturer(db.Model):
     __tablename__ = 'manufacturer'
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
@@ -19,6 +18,10 @@ class Manufacturer(db.Model):
     Password = db.Column(db.String(128), nullable=False)
     Companyname = db.Column(db.String(128))
     Contactinfo = db.Column(db.String(128))
+    
+    
+    supplies = db.relationship('Supply', backref='manufacturer', lazy=True)
+
 
 
 
@@ -94,6 +97,7 @@ class Cart(db.Model):
 
 
 
+
 class CartItem(db.Model):
     __tablename__ = 'cartitem'
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -101,13 +105,16 @@ class CartItem(db.Model):
     ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
     quantity = db.Column(db.BigInteger, nullable=False)
 
-
 class Supply(db.Model):
     __tablename__ = 'supply'
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     supply_name = db.Column(db.String(255), nullable=False)
     quantity_ordered = db.Column(db.BigInteger, nullable=False)
     order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    manufacturer_id = db.Column(db.Integer, db.ForeignKey('manufacturer.ID'), nullable=False)
+
+
 
 class SupplyOrder(db.Model):
     __tablename__ = 'supply_order'

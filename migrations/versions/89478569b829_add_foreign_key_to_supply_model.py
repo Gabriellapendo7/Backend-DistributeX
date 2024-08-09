@@ -1,8 +1,8 @@
-"""Models
+"""Add foreign key to Supply model
 
-Revision ID: 44e0fb981f99
+Revision ID: 89478569b829
 Revises: 
-Create Date: 2024-08-09 12:47:11.996252
+Create Date: 2024-08-09 15:16:49.091751
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '44e0fb981f99'
+revision = '89478569b829'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -54,13 +54,6 @@ def upgrade():
     sa.UniqueConstraint('Email'),
     sa.UniqueConstraint('Username')
     )
-    op.create_table('supply',
-    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('supply_name', sa.String(length=255), nullable=False),
-    sa.Column('quantity_ordered', sa.BigInteger(), nullable=False),
-    sa.Column('order_date', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('ID')
-    )
     op.create_table('cart',
     sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('ClientID', sa.BigInteger(), nullable=False),
@@ -77,6 +70,15 @@ def upgrade():
     sa.ForeignKeyConstraint(['ClientID'], ['client.ID'], name=op.f('fk_order_ClientID_client')),
     sa.PrimaryKeyConstraint('ID')
     )
+    op.create_table('supply',
+    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('supply_name', sa.String(length=255), nullable=False),
+    sa.Column('quantity_ordered', sa.BigInteger(), nullable=False),
+    sa.Column('order_date', sa.DateTime(), nullable=False),
+    sa.Column('manufacturer_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['manufacturer_id'], ['manufacturer.ID'], name=op.f('fk_supply_manufacturer_id_manufacturer')),
+    sa.PrimaryKeyConstraint('ID')
+    )
     op.create_table('product',
     sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('Productname', sa.String(length=255), nullable=False),
@@ -91,6 +93,17 @@ def upgrade():
     sa.ForeignKeyConstraint(['CategoryID'], ['category.ID'], name=op.f('fk_product_CategoryID_category')),
     sa.ForeignKeyConstraint(['manufacturerID'], ['manufacturer.ID'], name=op.f('fk_product_manufacturerID_manufacturer')),
     sa.ForeignKeyConstraint(['supply_id'], ['supply.ID'], name=op.f('fk_product_supply_id_supply')),
+    sa.PrimaryKeyConstraint('ID')
+    )
+    op.create_table('receipt',
+    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('OrderID', sa.BigInteger(), nullable=False),
+    sa.Column('ClientID', sa.BigInteger(), nullable=False),
+    sa.Column('ReceiptDate', sa.DateTime(), nullable=False),
+    sa.Column('Total', sa.BigInteger(), nullable=False),
+    sa.Column('Payment', sa.BigInteger(), nullable=False),
+    sa.ForeignKeyConstraint(['ClientID'], ['client.ID'], name=op.f('fk_receipt_ClientID_client')),
+    sa.ForeignKeyConstraint(['OrderID'], ['order.ID'], name=op.f('fk_receipt_OrderID_order')),
     sa.PrimaryKeyConstraint('ID')
     )
     op.create_table('cartitem',
@@ -112,26 +125,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['ProductID'], ['product.ID'], name=op.f('fk_orderdetails_ProductID_product')),
     sa.PrimaryKeyConstraint('ID')
     )
-    op.create_table('receipt',
-    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('OrderID', sa.BigInteger(), nullable=False),
-    sa.Column('ClientID', sa.BigInteger(), nullable=False),
-    sa.Column('ReceiptDate', sa.DateTime(), nullable=False),
-    sa.Column('Total', sa.BigInteger(), nullable=False),
-    sa.Column('Payment', sa.BigInteger(), nullable=False),
-    sa.ForeignKeyConstraint(['ClientID'], ['client.ID'], name=op.f('fk_receipt_ClientID_client')),
-    sa.ForeignKeyConstraint(['OrderID'], ['order.ID'], name=op.f('fk_receipt_OrderID_order')),
-    sa.PrimaryKeyConstraint('ID')
-    )
-    op.create_table('supply_order',
-    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('ProductID', sa.BigInteger(), nullable=False),
-    sa.Column('orderDate', sa.DateTime(), nullable=False),
-    sa.Column('quantity', sa.BigInteger(), nullable=False),
-    sa.Column('total_price', sa.BigInteger(), nullable=False),
-    sa.ForeignKeyConstraint(['ProductID'], ['product.ID'], name=op.f('fk_supply_order_ProductID_product')),
-    sa.PrimaryKeyConstraint('ID')
-    )
     op.create_table('sales',
     sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('ReceiptID', sa.BigInteger(), nullable=False),
@@ -144,20 +137,29 @@ def upgrade():
     sa.ForeignKeyConstraint(['ReceiptID'], ['receipt.ID'], name=op.f('fk_sales_ReceiptID_receipt')),
     sa.PrimaryKeyConstraint('ID')
     )
+    op.create_table('supply_order',
+    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('ProductID', sa.BigInteger(), nullable=False),
+    sa.Column('orderDate', sa.DateTime(), nullable=False),
+    sa.Column('quantity', sa.BigInteger(), nullable=False),
+    sa.Column('total_price', sa.BigInteger(), nullable=False),
+    sa.ForeignKeyConstraint(['ProductID'], ['product.ID'], name=op.f('fk_supply_order_ProductID_product')),
+    sa.PrimaryKeyConstraint('ID')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('sales')
     op.drop_table('supply_order')
-    op.drop_table('receipt')
+    op.drop_table('sales')
     op.drop_table('orderdetails')
     op.drop_table('cartitem')
+    op.drop_table('receipt')
     op.drop_table('product')
+    op.drop_table('supply')
     op.drop_table('order')
     op.drop_table('cart')
-    op.drop_table('supply')
     op.drop_table('manufacturer')
     op.drop_table('client')
     op.drop_table('category')
