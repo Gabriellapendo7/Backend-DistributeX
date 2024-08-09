@@ -29,15 +29,18 @@ def create_manufacturer():
 def login_manufacturer():
     data = request.get_json()
 
-    if not all(key in data for key in ("username", "password")):
-        return make_response({"error": "Username and password are required"}, 400)
+    if not all(key in data for key in ("email", "password")):
+        return make_response({"error": "Email and password are required"}, 400)
 
-    username = data["username"]
+    email = data["email"]
     password = data["password"]
 
-    manufacturer = Manufacturer.query.filter_by(Username=username).first()
+    manufacturer = Manufacturer.query.filter_by(Email=email).first()
 
-    if manufacturer and bcrypt.check_password_hash(manufacturer.Password, password):
+    if manufacturer is None:
+        return make_response({"error": "Email not found"}, 404)
+
+    if bcrypt.check_password_hash(manufacturer.Password, password):
         return make_response({"message": "Login successful", "manufacturer_id": manufacturer.ID}, 200)
     else:
         return make_response({"error": "Invalid credentials"}, 401)
