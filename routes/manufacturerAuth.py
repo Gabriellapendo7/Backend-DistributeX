@@ -1,7 +1,7 @@
 from flask import Blueprint, make_response, request
 from models import Manufacturer
-from config import db  
-from helpers import commit_session, bcrypt  # Ensure bcrypt is imported for password hashing
+from config import db, bcrypt 
+from helpers import commit_session  
 
 manufacturer_auth_bp = Blueprint('manufacturer_auth', __name__)
 
