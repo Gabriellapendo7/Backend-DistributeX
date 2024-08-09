@@ -102,18 +102,12 @@ class CartItem(db.Model):
     quantity = db.Column(db.BigInteger, nullable=False)
 
 
-
 class Supply(db.Model):
     __tablename__ = 'supply'
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    AdminID = db.Column(db.BigInteger, db.ForeignKey('admin.ID'), nullable=False)
-    ManufacturerID = db.Column(db.BigInteger, db.ForeignKey('manufacturer.ID'), nullable=False)
     supply_name = db.Column(db.String(255), nullable=False)
     quantity_ordered = db.Column(db.BigInteger, nullable=False)
     order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
-
-
 
 class SupplyOrder(db.Model):
     __tablename__ = 'supply_order'
