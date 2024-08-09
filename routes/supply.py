@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from config import db
-from models import Supply  e
+from models import Supply  
 
 supply_bp = Blueprint('supply', __name__)
 
