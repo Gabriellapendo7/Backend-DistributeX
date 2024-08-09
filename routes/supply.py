@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from config import db
 from models import Supply  
+from datetime import datetime
 import logging
 
 supply_bp = Blueprint('supply', __name__)
@@ -11,15 +12,17 @@ def add_supply():
     
     data = request.get_json()
 
-    # Ensure all necessary fields are present
     if not all(key in data for key in ('supply_name', 'quantity_ordered', 'order_date')):
         return jsonify({'message': 'Missing data'}), 400
 
     try:
+        # Convert order_date from string to datetime object
+        order_date = datetime.strptime(data['order_date'], "%Y-%m-%d")
+
         new_supply = Supply(
             supply_name=data['supply_name'],
             quantity_ordered=data['quantity_ordered'],
-            order_date=data['order_date']  # Ensure order_date is a valid datetime string
+            order_date=order_date  # Use the converted datetime object
         )
 
         db.session.add(new_supply)
