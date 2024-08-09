@@ -12,17 +12,14 @@ def add_supply():
     data = request.get_json()
 
     # Ensure all necessary fields are present
-    if not all(key in data for key in ('AdminID', 'ManufacturerID', 'supply_name', 'quantity_ordered', 'order_date', 'ProductID')):
+    if not all(key in data for key in ('supply_name', 'quantity_ordered', 'order_date')):
         return jsonify({'message': 'Missing data'}), 400
 
     try:
         new_supply = Supply(
-            AdminID=data['AdminID'],
-            ManufacturerID=data['ManufacturerID'],
             supply_name=data['supply_name'],
             quantity_ordered=data['quantity_ordered'],
-            order_date=data['order_date'], 
-            ProductID=data['ProductID']
+            order_date=data['order_date']  # Ensure order_date is a valid datetime string
         )
 
         db.session.add(new_supply)
