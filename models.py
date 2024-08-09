@@ -126,7 +126,7 @@ class SupplyOrder(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contact_information = db.Column(db.Text, nullable=False)
     delivery_schedule = db.Column(db.DateTime, nullable=False)
-    pricing_and_payment = db.Column(db.Float, nullable=False)
+    pricing_and_payment = db.Column(db.String, nullable=False)
     shipping_information = db.Column(db.Text, nullable=False)
     product_information = db.Column(db.Text, nullable=False)
     order_details = db.Column(db.Text, nullable=False)
