@@ -7,6 +7,7 @@ from routes.supply import supply_bp
 from routes.supply_order import supply_order_bp 
 
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -21,7 +22,7 @@ def create_app():
 
     app.register_blueprint(manufacturer_auth_bp)  
     app.register_blueprint(supply_bp)
-    app.register_blueprint(supply_order_bp)
+    app.register_blueprint(supply_order_bp, url_prefix='/api')
 
     return app
 

@@ -7,6 +7,23 @@ from models import SupplyOrder
 supply_order_bp = Blueprint('supply_order', __name__)
 api = Api(supply_order_bp)
 
+class SupplyOrderList(Resource):
+    def get(self):
+        supply_orders = SupplyOrder.query.all()
+        result = []
+        for order in supply_orders:
+            result.append({
+                'ID': order.ID,
+                'contact_information': order.contact_information,
+                'delivery_schedule': order.delivery_schedule.isoformat(),
+                'pricing_and_payment': order.pricing_and_payment,
+                'shipping_information': order.shipping_information,
+                'product_information': order.product_information,
+                'order_details': order.order_details,
+                'ProductID': order.ProductID
+            })
+        return result, 200
+
 class SupplyOrderGet(Resource):
     def get(self, id):
         supply_order = SupplyOrder.query.get(id)
@@ -22,7 +39,7 @@ class SupplyOrderGet(Resource):
             'product_information': supply_order.product_information,
             'order_details': supply_order.order_details,
             'ProductID': supply_order.ProductID
-        }
+        }, 200
 
 class SupplyOrderPost(Resource):
     def post(self):
@@ -55,8 +72,6 @@ class SupplyOrderPost(Resource):
         except Exception as e:
             return {'error': str(e)}, 500
 
-
-            
 class SupplyOrderDelete(Resource):
     def delete(self, id):
         supply_order = SupplyOrder.query.get(id)
@@ -69,6 +84,8 @@ class SupplyOrderDelete(Resource):
 
         return {'message': 'Supply Order deleted'}, 200
 
+api.add_resource(SupplyOrderList, '/supply_orders')
+api.add_resource(SupplyOrderGet, '/supply_orders')
 api.add_resource(SupplyOrderGet, '/supply_orders/<int:id>')
 api.add_resource(SupplyOrderPost, '/supply_orders')
 api.add_resource(SupplyOrderDelete, '/supply_orders/<int:id>')
