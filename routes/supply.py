@@ -66,7 +66,6 @@ def update_supply(supply_id):
         if not supply:
             return jsonify({'message': 'Supply not found'}), 404
 
-        # Update supply details
         supply.supply_name = data['supply_name']
         supply.quantity_ordered = data['quantity_ordered']
         supply.order_date = datetime.strptime(data['order_date'], "%Y-%m-%d")
