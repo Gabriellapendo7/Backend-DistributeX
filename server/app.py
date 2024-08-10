@@ -20,11 +20,10 @@ jwt = JWTManager(app)
 # Models start here
 class Admin(db.Model):
     __tablename__ = 'admin'
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Username = db.Column(db.String(64), unique=True, nullable=False)
     Email = db.Column(db.String(120), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
-
 
 class Manufacturer(db.Model):
     __tablename__ = 'manufacturer'
@@ -156,22 +155,48 @@ class Sales(db.Model):
 def register():
     data = request.get_json()
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    new_admin = Admin(username=data['username'], password=hashed_password)
-    db.session.add(new_admin)
+    role = data['role']
+
+    if role == 'Admin':
+        new_user = Admin(
+            Username=data['username'], 
+            Email=data['email'],       
+            Password=hashed_password
+        )
+    elif role == 'Client':
+        new_user = Client(
+            Username=data['username'],
+            Email=data['email'],
+            Password=hashed_password,
+            Shipping_address=data.get('shipping_address', '')  # Default to empty string if not provided
+        )
+    elif role == 'Manufacturer':
+        new_user = Manufacturer(
+            Username=data['username'],
+            Email=data['email'],
+            Password=hashed_password,
+            Companyname=data.get('company_name', ''),  # Default to empty string if not provided
+            Contactinfo=data.get('contact_info', '')    # Default to empty string if not provided
+        )
+    else:
+        return jsonify(message="Invalid role"), 400
+
+    db.session.add(new_user)
     db.session.commit()
-    return jsonify(message="Admin registered"), 201
+    return jsonify(message=f"{role} registered successfully"), 201
 
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    admin = Admin.query.filter_by(username=data['username']).first()
-    if admin and bcrypt.check_password_hash(admin.password, data['password']):
+    admin = Admin.query.filter_by(Username=data['Username']).first()  # Use 'Username'
+    if admin and bcrypt.check_password_hash(admin.Password, data['Password']):  # Use 'Password'
         access_token = create_access_token(identity={'admin_id': admin.ID})
         return jsonify(access_token=access_token), 200
     return jsonify(message="Invalid credentials"), 401
 
+
 @app.route('/sales', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_sales():
     if request.method == 'POST':
         data = request.get_json()
@@ -191,7 +216,7 @@ def manage_sales():
         return jsonify([sale.to_dict() for sale in sales]), 200
 
 @app.route('/products', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_products():
     if request.method == 'POST':
         data = request.get_json()
@@ -212,7 +237,7 @@ def manage_products():
         return jsonify([product.to_dict() for product in products]), 200
 
 @app.route('/orders', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_orders():
     if request.method == 'POST':
         data = request.get_json()
@@ -230,7 +255,7 @@ def manage_orders():
         return jsonify([order.to_dict() for order in orders]), 200
 
 @app.route('/order-details', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_order_details():
     if request.method == 'POST':
         data = request.get_json()
@@ -248,7 +273,7 @@ def manage_order_details():
         return jsonify([detail.to_dict() for detail in order_details]), 200
 
 @app.route('/clients', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_clients():
     if request.method == 'POST':
         data = request.get_json()
@@ -267,7 +292,7 @@ def manage_clients():
         return jsonify([client.to_dict() for client in clients]), 200
 
 @app.route('/categories', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_categories():
     if request.method == 'POST':
         data = request.get_json()
@@ -283,7 +308,7 @@ def manage_categories():
         return jsonify([category.to_dict() for category in categories]), 200
 
 @app.route('/carts', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_carts():
     if request.method == 'POST':
         data = request.get_json()
@@ -299,7 +324,7 @@ def manage_carts():
         return jsonify([cart.to_dict() for cart in carts]), 200
 
 @app.route('/cart-items', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_cart_items():
     if request.method == 'POST':
         data = request.get_json()
@@ -316,7 +341,7 @@ def manage_cart_items():
         return jsonify([item.to_dict() for item in cart_items]), 200
 
 @app.route('/supplies', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_supplies():
     if request.method == 'POST':
         data = request.get_json()
@@ -336,7 +361,7 @@ def manage_supplies():
         return jsonify([supply.to_dict() for supply in supplies]), 200
 
 @app.route('/manufacturers', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_manufacturers():
     if request.method == 'POST':
         data = request.get_json()
@@ -356,7 +381,7 @@ def manage_manufacturers():
         return jsonify([manufacturer.to_dict() for manufacturer in manufacturers]), 200
 
 @app.route('/supply-orders', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_supply_orders():
     if request.method == 'POST':
         data = request.get_json()
@@ -374,7 +399,7 @@ def manage_supply_orders():
         return jsonify([order.to_dict() for order in supply_orders]), 200
 
 @app.route('/receipts', methods=['GET', 'POST'])
-@jwt_required()
+#@jwt_required()
 def manage_receipts():
     if request.method == 'POST':
         data = request.get_json()
