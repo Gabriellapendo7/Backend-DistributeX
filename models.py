@@ -117,9 +117,6 @@ class Manufacturer(db.Model):
     supplies = db.relationship('Supply', backref='manufacturer', lazy=True)
 
 
-
-
-
 class SupplyOrder(db.Model):
     __tablename__ = 'supply_order'
     
@@ -133,8 +130,6 @@ class SupplyOrder(db.Model):
     
     ProductID = db.Column(db.BigInteger, db.ForeignKey('product.ID'), nullable=False)
     product = db.relationship("Product", backref="supply_orders")  
-
-
 
 
 class Sales(db.Model):

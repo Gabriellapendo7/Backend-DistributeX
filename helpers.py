@@ -78,10 +78,10 @@ def dollar_to_cents(dollar_amount):
     ValueError: If the dollar amount is invalid.
     """
     try:
-        # Check if the input is already an integer
+
         if isinstance(dollar_amount, int):
             return dollar_amount * 100
-        # Convert to float for string or float inputs, then to int
+
         return int(float(dollar_amount) * 100)
     except ValueError:
         raise ValueError(f"Invalid dollar amount: {dollar_amount}")
