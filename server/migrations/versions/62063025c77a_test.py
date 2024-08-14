@@ -1,8 +1,8 @@
 """test
 
-Revision ID: c7147ddc3e46
+Revision ID: 62063025c77a
 Revises: 
-Create Date: 2024-08-08 21:57:18.331166
+Create Date: 2024-08-12 10:59:38.984270
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c7147ddc3e46'
+revision = '62063025c77a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -139,16 +139,16 @@ def upgrade():
     sa.PrimaryKeyConstraint('ID')
     )
     op.create_table('sales',
-    sa.Column('ID', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('ReceiptID', sa.BigInteger(), nullable=False),
-    sa.Column('AdminID', sa.BigInteger(), nullable=False),
-    sa.Column('TotalAmount', sa.BigInteger(), nullable=False),
-    sa.Column('ClientID', sa.BigInteger(), nullable=False),
-    sa.Column('Sale_date', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['AdminID'], ['admin.ID'], ),
-    sa.ForeignKeyConstraint(['ClientID'], ['client.ID'], ),
-    sa.ForeignKeyConstraint(['ReceiptID'], ['receipt.ID'], ),
-    sa.PrimaryKeyConstraint('ID')
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('receipt_id', sa.BigInteger(), nullable=False),
+    sa.Column('admin_id', sa.BigInteger(), nullable=False),
+    sa.Column('total_amount', sa.BigInteger(), nullable=False),
+    sa.Column('client_id', sa.BigInteger(), nullable=False),
+    sa.Column('sale_date', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['admin_id'], ['admin.ID'], ),
+    sa.ForeignKeyConstraint(['client_id'], ['client.ID'], ),
+    sa.ForeignKeyConstraint(['receipt_id'], ['receipt.ID'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 

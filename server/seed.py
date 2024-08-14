@@ -176,14 +176,13 @@ with app.app_context():
     sales = []
     for receipt in receipts:
         sale = Sales(
-            ReceiptID=receipt.ID,
-            AdminID=random.choice([admin1.ID, admin2.ID]),
-            TotalAmount=receipt.Total,
-            ClientID=receipt.ClientID,
-            Sale_date=datetime.utcnow()
+            receipt_id=receipt.ID,
+            admin_id=random.choice([admin1.ID, admin2.ID]),
+            total_amount=receipt.Total,
+            client_id=receipt.ClientID,
+            sale_date=datetime.utcnow()
         )
         sales.append(sale)
     db.session.add_all(sales)
     db.session.commit()
-
-    print("Database seeded with fake data!")
+print ("Database seeded!")

@@ -98,6 +98,16 @@ class Receipt(db.Model):
     Total = db.Column(db.BigInteger, nullable=False)
     Payment = db.Column(db.BigInteger, nullable=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'order_id': self.OrderID,
+            'client_id': self.ClientID,
+            'receipt_date': self.ReceiptDate,
+            'total': self.Total,
+            'payment': self.Payment
+        }
+
 
 
 class Cart(db.Model):
@@ -141,12 +151,23 @@ class SupplyOrder(db.Model):
 
 class Sales(db.Model):
     __tablename__ = 'sales'
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ReceiptID = db.Column(db.BigInteger, db.ForeignKey('receipt.ID'), nullable=False)
-    AdminID = db.Column(db.BigInteger, db.ForeignKey('admin.ID'), nullable=False)
-    TotalAmount = db.Column(db.BigInteger, nullable=False)
-    ClientID = db.Column(db.BigInteger, db.ForeignKey('client.ID'), nullable=False)
-    Sale_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    receipt_id = db.Column(db.BigInteger, db.ForeignKey('receipt.ID'), nullable=False)
+    admin_id = db.Column(db.BigInteger, db.ForeignKey('admin.ID'), nullable=False)
+    total_amount = db.Column(db.BigInteger, nullable=False)
+    client_id = db.Column(db.BigInteger, db.ForeignKey('client.ID'), nullable=False)
+    sale_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'receipt_id': self.receipt_id,
+            'admin_id': self.admin_id,
+            'total_amount': self.total_amount,
+            'client_id': self.client_id,
+            'sale_date': self.sale_date.isoformat()
+        }
+
 
 # Models end here    
 
@@ -202,15 +223,16 @@ def manage_sales():
         data = request.get_json()
         current_user = get_jwt_identity()
         new_sale = Sales(
-            ReceiptID=data['receipt_id'],
-            AdminID=current_user['admin_id'],
-            TotalAmount=data['total_amount'],
-            ClientID=data['client_id'],
-            Sale_date=datetime.utcnow()
+            receipt_id=data['receipt_id'],
+            admin_id=current_user['admin_id'],
+            total_amount=data['total_amount'],
+            client_id=data['client_id'],
+            sale_date=datetime.utcnow()
         )
         db.session.add(new_sale)
         db.session.commit()
         return jsonify(message="Sale recorded"), 201
+
     elif request.method == 'GET':
         sales = Sales.query.all()
         return jsonify([sale.to_dict() for sale in sales]), 200
@@ -398,8 +420,7 @@ def manage_supply_orders():
         supply_orders = SupplyOrder.query.all()
         return jsonify([order.to_dict() for order in supply_orders]), 200
 
-@app.route('/receipts', methods=['GET', 'POST'])
-#@jwt_required()
+@app.route('/receipt', methods=['GET', 'POST'])
 def manage_receipts():
     if request.method == 'POST':
         data = request.get_json()
@@ -412,10 +433,11 @@ def manage_receipts():
         )
         db.session.add(new_receipt)
         db.session.commit()
-        return jsonify(message="Receipt created"), 201
+        return jsonify(new_receipt.to_dict()), 201
     elif request.method == 'GET':
         receipts = Receipt.query.all()
         return jsonify([receipt.to_dict() for receipt in receipts]), 200
+
 # Routes end here    
     
 
