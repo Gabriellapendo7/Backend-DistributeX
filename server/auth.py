@@ -1,9 +1,9 @@
 from flask import request, jsonify, url_for, render_template
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import db, Admin, Manufacturer, Client
-from app.utils.email import send_reset_email
-from app.utils.security import generate_reset_token, verify_reset_token
+from models import db, Admin, Manufacturer, Client
+from utils.email import send_reset_email
+from utils.security import generate_reset_token, verify_reset_token
 from . import auth_bp
 
 @auth_bp.route('/admin/login', methods=['POST'])

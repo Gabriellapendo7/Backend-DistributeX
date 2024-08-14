@@ -131,6 +131,7 @@ class SupplyOrder(db.Model):
     orderDate = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     quantity = db.Column(db.BigInteger, nullable=False)
     total_price = db.Column(db.BigInteger, nullable=False)
+    
 
 class Sales(db.Model):
     __tablename__ = 'sales'
