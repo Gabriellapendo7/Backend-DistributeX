@@ -12,7 +12,6 @@ bcrypt = Bcrypt()
 manufacturer_pass_recovery_bp = Blueprint('manufacturer_pass_recovery_bp', __name__, url_prefix='/manufacturer')
 manufacturer_pass_recovery_api = Api(manufacturer_pass_recovery_bp)
 
-# Setup logging
 logging.basicConfig(level=logging.DEBUG)
 
 class ManufacturerPasswordRecovery(Resource):
