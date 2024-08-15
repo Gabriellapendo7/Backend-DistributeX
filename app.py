@@ -9,6 +9,7 @@ from routes.categories import categories_bp
 from routes.product_categories import product_categories_bp
 from routes.login import login_bp
 from routes.manufacturer import manufacturer_bp
+from routes.adminProducts import admin_products_bp 
 
 def create_app():
     app = Flask(__name__, static_folder="../client/src/assets", static_url_path="/assets")
@@ -22,7 +23,6 @@ def create_app():
 
     api = Api(app)
 
-    # Register blueprints
     app.register_blueprint(products_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(orders_bp)
@@ -30,6 +30,7 @@ def create_app():
     app.register_blueprint(product_categories_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(manufacturer_bp)
+    app.register_blueprint(admin_products_bp, url_prefix='/admin')  
 
     return app
 

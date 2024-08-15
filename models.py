@@ -77,6 +77,8 @@ class Product(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<Product {self.name}>"
 
+
+
 # Category Model
 class Category(db.Model, SerializerMixin):
     __tablename__ = "categories"
