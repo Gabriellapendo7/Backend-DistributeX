@@ -32,6 +32,7 @@ metadata = MetaData(
 # Product Model
 class Product(db.Model, SerializerMixin):
     __tablename__ = "products"
+    
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
@@ -214,7 +215,6 @@ class Manufacturer(db.Model):
     def authenticate(self, password):
         return check_password_hash(self.password, password)
 
-# ManufacturerProduct Model
 class ManufacturerProduct(db.Model, SerializerMixin):
     __tablename__ = 'manufacturer_products'
 
@@ -222,8 +222,9 @@ class ManufacturerProduct(db.Model, SerializerMixin):
     manufacturer_id = db.Column(db.Integer, db.ForeignKey('manufacturers.id'), nullable=False)
     product_name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    price = db.Column(db.Integer, nullable=False)  # Price in cents
+    price = db.Column(db.Integer, nullable=False)
     item_quantity = db.Column(db.Integer, nullable=False)
+    admins_contact_info = db.Column(db.String(150), nullable=True)  
 
     manufacturer = db.relationship('Manufacturer', back_populates='products')
 
@@ -238,6 +239,7 @@ class ManufacturerProduct(db.Model, SerializerMixin):
             'description': self.description,
             'price': self.price,
             'item_quantity': self.item_quantity,
+            'admins_contact_info': self.admins_contact_info,
         }
 
 # AdminOrder Model
