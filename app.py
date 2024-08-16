@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from config import Config, db, ma, migrate, bcrypt
 
-# Import blueprints from the routes folder
+
 from routes.products import products_bp
 from routes.users import users_bp
 from routes.orders import orders_bp
@@ -14,22 +14,19 @@ from routes.adminProducts import admin_products_bp
 from routes.clientsGetByAdmin import clients_bp
 from routes.adminManufacturerOrders import adminManufacturerOrders_bp
 from routes.supply import supply_bp
-from routes.manufacturersGetByAdmin import manufacturersGetByAdmin_bp  # Import the renamed blueprint
+from routes.manufacturersGetByAdmin import manufacturersGetByAdmin_bp  
 
 def create_app():
     app = Flask(__name__, static_folder="../client/src/assets", static_url_path="/assets")
     app.config.from_object(Config)
 
-    # Initialize CORS
     CORS(app)
 
-    # Initialize extensions
     db.init_app(app)
     ma.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
-    # Register blueprints with URL prefixes
     app.register_blueprint(products_bp, url_prefix='/api/products')
     app.register_blueprint(users_bp, url_prefix='/api/users')
     app.register_blueprint(orders_bp, url_prefix='/api/orders')
@@ -41,7 +38,7 @@ def create_app():
     app.register_blueprint(admin_products_bp, url_prefix='/admin/products')
     app.register_blueprint(adminManufacturerOrders_bp, url_prefix='/admin/orders')
     app.register_blueprint(supply_bp, url_prefix='/api/supply')
-    app.register_blueprint(manufacturersGetByAdmin_bp, url_prefix='/admin/manufacturers')  # Register the renamed blueprint
+    app.register_blueprint(manufacturersGetByAdmin_bp, url_prefix='/admin/manufacturers')  
 
     return app
 

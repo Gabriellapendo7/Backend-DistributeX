@@ -15,17 +15,12 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
 
-# Models go here!
-# one to many relationship between order and order details
-# one to many relationship between user and orders
-
 metadata = MetaData(
     naming_convention={
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     }
 )
 
-# Product Model
 class Product(db.Model, SerializerMixin):
     __tablename__ = "products"
     
@@ -76,7 +71,6 @@ class Product(db.Model, SerializerMixin):
 
 
 
-# Category Model
 class Category(db.Model, SerializerMixin):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
@@ -96,7 +90,8 @@ class Category(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<Category {self.name}>"
 
-# ProductCategory Model
+
+
 class ProductCategory(db.Model, SerializerMixin):
     __tablename__ = "product_categories"
 
@@ -119,7 +114,8 @@ class ProductCategory(db.Model, SerializerMixin):
     def __repr__(self):
         return f"<ProductCategory Product: {self.product_id}, Category: {self.category_id}>"
 
-# User Model
+
+
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -158,7 +154,8 @@ class User(db.Model, SerializerMixin):
 
     serialize_rules = ("-orders",)
 
-# Order Model
+
+
 class Order(db.Model, SerializerMixin):
     __tablename__ = "orders"
     id = db.Column(db.Integer, primary_key=True)
@@ -167,7 +164,8 @@ class Order(db.Model, SerializerMixin):
     order_details = db.relationship("OrderDetail", back_populates="order")
     user = db.relationship("User", back_populates="orders")
 
-# OrderDetail Model
+
+
 class OrderDetail(db.Model, SerializerMixin):
     __tablename__ = "order_details"
     id = db.Column(db.Integer, primary_key=True)
@@ -182,7 +180,7 @@ class OrderDetail(db.Model, SerializerMixin):
         "-product",
     )
 
-# Manufacturer Model
+
 class Manufacturer(db.Model):
     __tablename__ = 'manufacturers'
 
@@ -258,7 +256,7 @@ class Supply(db.Model):
 
 
 
-# AdminOrder Model
+
 class AdminOrder(db.Model, SerializerMixin):
     __tablename__ = 'admin_orders'
 
