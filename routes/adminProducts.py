@@ -25,10 +25,9 @@ class ProductResource(Resource):
 
     def post(self):
         data = request.get_json()
-        print("Received product data:", data)  # Add this line
+        print("Received product data:", data)
         required_fields = ['productName', 'price', 'itemQuantity']
 
-    # Check for missing fields
         for field in required_fields:
             if field not in data or not data[field]:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -36,7 +35,7 @@ class ProductResource(Resource):
         try:
             new_product = Product(
                 productName=data['productName'],
-                description=data.get('description', ''),  # Optional field
+                description=data.get('description', ''),  
                 price=data['price'],
                 itemQuantity=data['itemQuantity'],
                 contactInfo=data.get('contactInfo', ''),  
