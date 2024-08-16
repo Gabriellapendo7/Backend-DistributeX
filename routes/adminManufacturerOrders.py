@@ -1,6 +1,6 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, abort, jsonify
 from flask_restful import Api, Resource
-from models import db, ManufacturerProduct  # Import from models, not from app
+from models import db, ManufacturerProduct
 
 adminManufacturerOrders_bp = Blueprint('adminManufacturerOrders_bp', __name__)
 api = Api(adminManufacturerOrders_bp)
@@ -11,10 +11,10 @@ class ManufacturerProductResource(Resource):
             product = ManufacturerProduct.query.get(product_id)
             if not product:
                 abort(404, description="Product not found")
-            return product.to_dict()  
+            return jsonify(product.to_dict())
         else:
             products = ManufacturerProduct.query.all()
-            return [product.to_dict() for product in products]  
+            return jsonify([product.to_dict() for product in products])
 
     def post(self):
         data = request.get_json()
@@ -23,7 +23,7 @@ class ManufacturerProductResource(Resource):
         
         product_name = data.get('productName')
         if not product_name:
-            abort(400, description="Missing or null value for field: product_name")
+            abort(400, description="Missing or null value for field: productName")
         
         product = ManufacturerProduct(
             manufacturer_id=data.get('manufacturer_id'),
@@ -36,7 +36,7 @@ class ManufacturerProductResource(Resource):
         
         db.session.add(product)
         db.session.commit()
-        return product.to_dict(), 201  
+        return jsonify(product.to_dict()), 201
 
     def put(self, product_id):
         product = ManufacturerProduct.query.get(product_id)
@@ -54,7 +54,7 @@ class ManufacturerProductResource(Resource):
         product.admins_contact_info = data.get('contactInfo', product.admins_contact_info)
 
         db.session.commit()
-        return product.to_dict() 
+        return jsonify(product.to_dict())
 
     def delete(self, product_id):
         product = ManufacturerProduct.query.get(product_id)
@@ -63,6 +63,6 @@ class ManufacturerProductResource(Resource):
 
         db.session.delete(product)
         db.session.commit()
-        return {'message': 'Product deleted successfully'}, 204 
+        return jsonify({'message': 'Product deleted successfully'}), 204
 
 api.add_resource(ManufacturerProductResource, '/products', '/products/<int:product_id>')
