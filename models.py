@@ -1,10 +1,6 @@
-# models.py
-# Models represent tables in database created with SQLAlchemy.
-
-# Import necessary modules from SQLAlchemy and SerializerMixin for serialization.
 import re
 from sqlalchemy.ext.declarative import declarative_base
-
+from datetime import datetime
 
 Base = declarative_base()
 from config import bcrypt, db
@@ -241,6 +237,26 @@ class ManufacturerProduct(db.Model, SerializerMixin):
             'item_quantity': self.item_quantity,
             'admins_contact_info': self.admins_contact_info,
         }
+
+
+
+
+
+
+class Supply(db.Model):
+    __tablename__ = 'supply'
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    supply_name = db.Column(db.String(255), nullable=False)
+    quantity_ordered = db.Column(db.BigInteger, nullable=False)
+    order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+
+
+
+
+
+
 
 # AdminOrder Model
 class AdminOrder(db.Model, SerializerMixin):

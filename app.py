@@ -13,6 +13,7 @@ from routes.manufacturer import manufacturer_bp
 from routes.adminProducts import admin_products_bp
 from routes.clientsGetByAdmin import clients_bp
 from routes.adminManufacturerOrders import adminManufacturerOrders_bp
+from routes.supply import supply_bp
 
 def create_app():
     app = Flask(__name__, static_folder="../client/src/assets", static_url_path="/assets")
@@ -38,6 +39,7 @@ def create_app():
     app.register_blueprint(clients_bp, url_prefix='/api/clients')
     app.register_blueprint(admin_products_bp, url_prefix='/admin/products')
     app.register_blueprint(adminManufacturerOrders_bp, url_prefix='/admin/orders')
+    app.register_blueprint(supply_bp, url_prefix='/api/supply')
 
     return app
 
