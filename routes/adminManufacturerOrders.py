@@ -1,7 +1,6 @@
 from flask import Blueprint, request, abort
 from flask_restful import Api, Resource
-from app import db
-from models import ManufacturerProduct
+from models import db, ManufacturerProduct  # Import from models, not from app
 
 adminManufacturerOrders_bp = Blueprint('adminManufacturerOrders_bp', __name__)
 api = Api(adminManufacturerOrders_bp)
@@ -22,7 +21,7 @@ class ManufacturerProductResource(Resource):
         if not data:
             abort(400, description="No input data provided")
         
-        product_name = data.get('productName')  # Ensure key matches the form field name
+        product_name = data.get('productName')
         if not product_name:
             abort(400, description="Missing or null value for field: product_name")
         
@@ -32,7 +31,7 @@ class ManufacturerProductResource(Resource):
             description=data.get('description'),
             price=data.get('price'),
             item_quantity=data.get('itemQuantity'),
-            admins_contact_info=data.get('contactInfo')  # Ensure this matches the form field name
+            admins_contact_info=data.get('contactInfo')
         )
         
         db.session.add(product)

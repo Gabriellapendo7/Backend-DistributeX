@@ -6,7 +6,7 @@ from config import db
 
 products_bp = Blueprint('products', __name__)
 
-@products_bp.route('/products', methods=['GET'])
+@products_bp.route('', methods=['GET'])
 def get_products():
     try:
         products = [
@@ -16,7 +16,7 @@ def get_products():
     except Exception as error:
         return make_response({"error": str(error)}, 500)
 
-@products_bp.route('/products', methods=['POST'])
+@products_bp.route('', methods=['POST'])
 def create_product():
     product_data = request.get_json()
     try:
@@ -52,7 +52,7 @@ def create_product():
     except Exception as error:
         return make_response({"error": str(error)}, 500)
 
-@products_bp.route('/products/<int:id>', methods=['GET'])
+@products_bp.route('/<int:id>', methods=['GET'])
 def get_product_by_id(id):
     product = Product.query.get(id)
     if product:
@@ -60,7 +60,7 @@ def get_product_by_id(id):
     else:
         return make_response({"error": "Product not found"}, 404)
 
-@products_bp.route('/products/<int:id>', methods=['PATCH'])
+@products_bp.route('/<int:id>', methods=['PATCH'])
 def update_product(id):
     product = Product.query.get(id)
     if product:
@@ -75,7 +75,7 @@ def update_product(id):
     else:
         return make_response({"error": "Product not found"}, 404)
 
-@products_bp.route('/products/<int:id>', methods=['DELETE'])
+@products_bp.route('/<int:id>', methods=['DELETE'])
 def delete_product(id):
     try:
         product = Product.query.get(id)

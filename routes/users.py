@@ -1,15 +1,16 @@
 from flask import Blueprint, make_response, request
 from models import User
-from config import db  
-from helpers import commit_session  
+from config import db
+from helpers import commit_session
 
 users_bp = Blueprint('users', __name__)
 
-@users_bp.route('/users', methods=['GET'])
+@users_bp.route('', methods=['GET'])  # Changed route to match '/api/users'
 def get_users():
-    return make_response([user.to_dict() for user in User.query.all()], 200)
+    users = User.query.all()
+    return make_response([user.to_dict() for user in users], 200)
 
-@users_bp.route('/users', methods=['POST'])
+@users_bp.route('', methods=['POST'])  # Changed route to match '/api/users'
 def create_user():
     user_data = request.get_json()
     try:
@@ -26,13 +27,12 @@ def create_user():
         new_user.password = user_data["password"]
         db.session.add(new_user)
         commit_session(db.session)
-
         return make_response({"message": "User created successfully"}, 201)
     except Exception as error:
         db.session.rollback()
         return make_response({"error": "User creation failed: " + str(error)}, 500)
 
-@users_bp.route('/users/delete', methods=['DELETE'])
+@users_bp.route('/delete', methods=['DELETE'])  # Adjusted route
 def delete_user():
     data = request.get_json()
     if not all(key in data for key in ("username", "password")):
@@ -49,7 +49,7 @@ def delete_user():
     else:
         return make_response({"error": "Invalid credentials"}, 401)
 
-@users_bp.route('/users/update', methods=['PATCH'])
+@users_bp.route('/update', methods=['PATCH'])  # Adjusted route
 def update_user_password():
     data = request.get_json()
     if not all(key in data for key in ("username", "password", "newPassword")):
